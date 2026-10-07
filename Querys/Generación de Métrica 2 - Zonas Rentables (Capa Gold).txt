@@ -1,0 +1,12 @@
+print("--- SCRIPT 5: CAPA GOLD - MÉTRICA DE RENTABILIDAD POR ZONA ---")
+df_zonas = spark.sql("""
+    SELECT pickup_borough as distrito, pickup_zone as zona, 
+           COUNT(*) as total_viajes, ROUND(AVG(total_amount), 2) as ingreso_promedio_usd
+    FROM taxis_silver 
+    GROUP BY pickup_borough, pickup_zone 
+    HAVING total_viajes > 500 
+    ORDER BY ingreso_promedio_usd DESC
+""")
+df_zonas.show(5)
+df_zonas.coalesce(1).write.mode("overwrite").csv("work/powerbi_zonas", header=True)
+print("-> Exportado a work/powerbi_zonas/")

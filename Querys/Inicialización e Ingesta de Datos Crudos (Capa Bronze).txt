@@ -1,0 +1,14 @@
+from pyspark.sql import SparkSession
+import pyspark.sql.functions as F
+
+print("--- SCRIPT 1: INICIALIZACIÓN Y CAPA BRONZE ---")
+spark = SparkSession.builder \
+    .appName("NYC_GreenTaxi_Pipeline") \
+    .config("spark.sql.legacy.timeParserPolicy", "LEGACY") \
+    .getOrCreate()
+
+# Lectura de datos crudos (apuntando a la carpeta work/)
+df_bronze_trips = spark.read.parquet("work/green_tripdata_*.parquet")
+df_bronze_zones = spark.read.csv("work/taxi-zone-lookup.csv", header=True, inferSchema=True)
+
+print(f"Registros crudos cargados en Bronze: {df_bronze_trips.count()}")

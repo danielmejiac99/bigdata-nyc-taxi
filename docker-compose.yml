@@ -1,0 +1,8 @@
+services:
+  spark-jupyter:
+    image: jupyter/pyspark-notebook:latest
+    ports:
+      - "8888:8888" # Puerto para Jupyter
+      - "4040:4040" # Puerto para ver el monitor de Spark (Spark UI)
+    volumes:
+      - ./big data pro final:/home/jovyan/work # Esto conecta tu carpeta actual a la carpeta 'work' de Jupyter

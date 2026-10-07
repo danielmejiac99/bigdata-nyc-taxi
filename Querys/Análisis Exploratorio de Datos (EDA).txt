@@ -1,0 +1,2 @@
+print("--- SCRIPT 2: ANÁLISIS EXPLORATORIO (EDA) EN RAW DATA ---")
+df_bronze_trips.select("trip_distance", "fare_amount", "passenger_count").describe().show()

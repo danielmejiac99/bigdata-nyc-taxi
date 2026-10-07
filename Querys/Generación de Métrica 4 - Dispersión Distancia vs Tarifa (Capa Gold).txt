@@ -1,0 +1,10 @@
+print("--- SCRIPT 7: CAPA GOLD - MÉTRICA DE DISPERSIÓN ---")
+df_dispersion = spark.sql("""
+    SELECT trip_distance as distancia_millas, total_amount as tarifa_total, hora
+    FROM taxis_silver 
+    WHERE trip_distance < 30 AND total_amount < 150
+""").sample(fraction=0.05, seed=42)
+
+df_dispersion.show(5)
+df_dispersion.coalesce(1).write.mode("overwrite").csv("work/powerbi_dispersion", header=True)
+print("-> Exportado a work/powerbi_dispersion/")

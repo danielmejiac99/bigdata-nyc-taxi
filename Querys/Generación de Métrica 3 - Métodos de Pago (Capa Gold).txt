@@ -1,0 +1,17 @@
+print("--- SCRIPT 6: CAPA GOLD - MÉTRICA DE MÉTODOS DE PAGO ---")
+df_pagos = spark.sql("""
+    SELECT 
+        CASE 
+            WHEN payment_type = 1 THEN 'Tarjeta de Crédito'
+            WHEN payment_type = 2 THEN 'Efectivo'
+            WHEN payment_type = 3 THEN 'Sin Cargo'
+            WHEN payment_type = 4 THEN 'Disputa'
+            ELSE 'Otro'
+        END as tipo_pago,
+        COUNT(*) as cantidad_viajes
+    FROM taxis_silver 
+    GROUP BY tipo_pago
+""")
+df_pagos.show(5)
+df_pagos.coalesce(1).write.mode("overwrite").csv("work/powerbi_pagos", header=True)
+print("-> Exportado a work/powerbi_pagos/")

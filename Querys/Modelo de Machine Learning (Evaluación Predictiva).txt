@@ -1,0 +1,22 @@
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.regression import LinearRegression
+from pyspark.ml.evaluation import RegressionEvaluator
+
+print("--- SCRIPT 8: MODELO DE MACHINE LEARNING (REGRESIÓN LINEAL) ---")
+
+df_ml = df_silver_enriched.select("trip_distance", "hora", "dia_semana", "total_amount").dropna()
+ensamblador = VectorAssembler(inputCols=["trip_distance", "hora", "dia_semana"], outputCol="features")
+df_ml_vector = ensamblador.transform(df_ml).select("features", "total_amount")
+
+train_data, test_data = df_ml_vector.randomSplit([0.8, 0.2], seed=42)
+
+lr = LinearRegression(featuresCol="features", labelCol="total_amount")
+lr_modelo = lr.fit(train_data)
+
+predicciones = lr_modelo.transform(test_data)
+evaluador_rmse = RegressionEvaluator(labelCol="total_amount", predictionCol="prediction", metricName="rmse")
+evaluador_r2 = RegressionEvaluator(labelCol="total_amount", predictionCol="prediction", metricName="r2")
+
+print(f"Métricas del Modelo:")
+print(f"- RMSE (Margen de error promedio): {evaluador_rmse.evaluate(predicciones):.2f} USD")
+print(f"- R2 (Correlación): {evaluador_r2.evaluate(predicciones):.2f}")

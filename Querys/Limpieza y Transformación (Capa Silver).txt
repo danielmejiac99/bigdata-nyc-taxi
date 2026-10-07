@@ -1,0 +1,27 @@
+print("--- SCRIPT 3: TRANSFORMACIÓN Y CAPA SILVER ---")
+
+# 1. Filtro de outliers y nulos (Veracidad)
+df_silver = df_bronze_trips.filter(
+    (F.col("trip_distance") > 0) & 
+    (F.col("fare_amount") > 0) & 
+    (F.col("passenger_count") > 0)
+).dropna(subset=["PULocationID", "DOLocationID"])
+
+# 2. Extracción de variables temporales (Transformación)
+df_silver = df_silver \
+    .withColumn("mes", F.month("lpep_pickup_datetime")) \
+    .withColumn("dia_semana", F.dayofweek("lpep_pickup_datetime")) \
+    .withColumn("hora", F.hour("lpep_pickup_datetime"))
+
+# 3. Cruce espacial (Variedad)
+df_silver_enriched = df_silver.join(
+    df_bronze_zones, 
+    df_silver.PULocationID == df_bronze_zones.LocationID, 
+    "left"
+).withColumnRenamed("Borough", "pickup_borough") \
+ .withColumnRenamed("Zone", "pickup_zone")
+
+print(f"Registros válidos tras limpieza en Silver: {df_silver_enriched.count()}")
+
+# Habilitar SQL
+df_silver_enriched.createOrReplaceTempView("taxis_silver")

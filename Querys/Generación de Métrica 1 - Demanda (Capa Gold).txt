@@ -1,0 +1,11 @@
+print("--- SCRIPT 4: CAPA GOLD - MÉTRICA DE DEMANDA ---")
+df_demanda = spark.sql("""
+    SELECT dia_semana, hora, COUNT(*) as total_viajes
+    FROM taxis_silver 
+    GROUP BY dia_semana, hora 
+    ORDER BY dia_semana, hora
+""")
+df_demanda.show(5)
+# Guardando dentro de work/ para que lo veas en Windows
+df_demanda.coalesce(1).write.mode("overwrite").csv("work/powerbi_demanda", header=True)
+print("-> Exportado a work/powerbi_demanda/")
